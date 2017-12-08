@@ -1,8 +1,31 @@
-# Ball Fall game
-Jocul ales de mine se numește “Ball Drop” și constă într-o minge aflată în cădere și în zone solide, generate de către joc, care se deplasează în sus. Bila poate fi împinsă în sus de o astfel de zonă solidă, iar jocul se termină atunci când bila este împinsă de o zonă solidă în afara ecranului.
-Jocul va folosi o matrice de led-uri ca mediu de desfășurare al jocului și un display LCD pentru informații suplimentare, cum ar fi scorul sau mesajul inițial adresat jucătorului. Controlul se va realiza printr-un joystick și printr-un buton
-Inițial, jucătorului îi este prezentată o configurație în care bila este așezată pe o zonă solidă ce se întinde pe întreaga lățime a matricei. Bila poate fi deplasată, dar deplasarea zonelor solide și începutul jocului așteaptă apăsarea butonului din partea utilizatorului.
-Odată ce jocul se încheie, pe matrice este desenat un model ce înștiințează jucătorul, iar restartul așteaptă apăsarea butonului.
-Cu fiecare nivel coborât de bilă scorul jucătorului crește cu o unitate, iar la anumite scoruri viteza de urcare a zonelor solide crește, astfel crescând dificultatea jocului. Tot la un anumit număr de puncte, variabil în funcție de dificultatea curentă, jocul va genera puncte care pot fi colectate de jucător, acesta obținând vieți extra pentru ele. 
-Mi-as dori ca, în funcție de timpul și resursele disponibile, să implementez și o metodă de persistare a scorurilor pe un card de memorie sau chiar într-o bază de date remote, accesată printr-un modul wi-fi.
+# Ball Fall
+## Proiect Introducere in Robotica cu Arduino
+Ball Fall este un joc dezvoltat pentru platforma Arduino si consta intr-o minge ce se deplaseaza in jos si o serie de palete ce se deplaseaza in sens opus. Scopul jocului este de a cadea pe o distanta cat mai mare, evitand paletele ce pot scoate mingea de pe suprafata display-ului in partea de sus.
 
+### Gameplay
+Initial jocul se afla in starea `INTRO`. Jucatorul poate deplasa bila pe directia x. Prin apasarea butonului de pe joystick jocul trece in starea `PLAYING`. La fiecare nivel coborat de bila, scorul jucatorului creste cu un punct. La fiecare 40 de puncte, viteza de urcare a paletelor creste cu 10 ms pana la limita de 200 ms. La fiecare 120 de puncte, jucatorul primeste o noua viata. De fiecare data cand bila este scoasa de pe suprafata de joc in partea de sus, jucatorul pierde o viata, iar cand acesta ajunge la 0 vieti, jocul trece in starea `OVER`. Aici jucatorul isi vede scorul, iar prin apasarea butonului, jocul este resetat si trecut in starea `PLAYING`.
+
+## #Cerinte hardware
+Jocul necesita o placuta Arduino, o matrice de LED-uri 8x8 controlata printr-un driver MAX 7219, un display LCD compatibil cu driver-ul Hitachi HD44780 si un joystick.
+
+### Librarii externe
+Jocul foloseste librariile LedControl, EventManager si LiquidCrystal pentru contrlul matricei de LED-uri, gestionarea evenimentelor intr-un mod asemanator asincron respectiv pentru controlul display-ului LCD. Primele doua se gasesc in folder-ul jocului, iar cea de-a treia este distribuita impreuna cu Arduino IDE.
+
+### Descriere cod
+Nucrelul jocului este implementat in clasa `ball_fall`. Aceasta pastreaza starea curenta a jocului, asupra careia pot fi efectuate urmatoarele comenzi:
+* `move_ball(direction)`
+* `drop_ball()` - returneaza scorul curent
+* `pads_up()` - returneaza `true` daca jocul contrinua, `false` altfel
+* `reset()`
+* `add_life()`
+Starea jocului poate fi interogata prin functiile:
+* `get_lifes()`
+* `get_score()`
+* `print_matrix(char[8][8])` - seteaza parametrul cu ceea ce afiseaza jocul
+* `print(char screen[8])` - seteaza parametrul cu ce afiseaza jocul formatat ca sir de octeti, special pentru afisarea pe matricea de LED-uri
+
+Desfasurarea jocului pe implementarea hardware se gaseste in fisierul *ball_fall.ino* de unde sunt apelate comenzile si interogarile pe nucleul jocului, gestionate resursele hardware (display-uri, joystick), gestionata dificultatea prin rata la care sunt apelate comenzile si starea in care se afla jocul la un moment dat (INTRO, PLAYING, OVER).
+
+Pentru programarea evenimentelor la anumite momente in timp este implementata clasa lifecycle_manager ce pastreaza o coada de pointeri de functii cu prioritatea data de momentul la care acestea se executa. Coada este implementata intr-o structura de tip min-heap. Capacitatea acestui heap poate fi setata prin redefinirea constantei `EVENT_COUNT`, setata la valoarea predefinita 20.
+
+Pentru gestionarea evenimentelor de *buton apasat* si *game over* se foloseste libraria *EventManager*.
