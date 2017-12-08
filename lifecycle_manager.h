@@ -7,12 +7,14 @@
 
 #include "heap.h"
 
+#define EVENT_COUNT 20
+
 class lifecycle_manager;
 
 typedef void (*action)(lifecycle_manager&, key_type);
 
 class lifecycle_manager {
-    heap<action, 20> queue;
+    heap<action, EVENT_COUNT> queue;
 
 public:
     lifecycle_manager();
