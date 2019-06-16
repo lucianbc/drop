@@ -3,6 +3,8 @@ Drop is a game developed for Arduino platform and is comprised of a falling ball
 
 This project was developed as a homework for the *Introduction to robotics with Arduino* course at the University of Bucharest.
 
+[Video demo](https://photos.app.goo.gl/e3Ct6j8UyayXbnqi8)
+
 ## Gameplay
 Initially the game is in the `INTRO` state. The player can move the ball horizontally and nothing happens. By pressing the joystick the game starts. For every unit the ball balls, the score grows by one point. For every 40 points the speed of the pads grows by 10 ms, up to the limmit of 200 ms. For every 120 points, the player gets a new life. Every time the ball is pushed outside the display area, the player looses a life. When the player runs out of lives, it's GAME OVER. Here the user sees his score and the can start over again.
 
